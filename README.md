@@ -1,5 +1,5 @@
 # doctocare-userUpdate
-Contains the updateUser application, used to update the DocteGestio database
+Contains the updateUser application, used to update the DocteGestio database.
 
 ## Dependencies
 To run this program, you'll need to download and install some python modules.
