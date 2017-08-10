@@ -102,7 +102,11 @@ def direct_update (data, table = "collaborateur", fields = ("prenom", "nom", "ma
     print("done.\n")
     # Generate the postgreSQL instructions from the data provided # 
     print("Generating instruction... ", end="")
-    instruction = "INSERT INTO " + table + " (prenom, nom, mail, mobile, structure_juridique, description, titre, departement) VALUES\n"
+    instruction = "INSERT INTO " + table + " ("
+    for i in range (len(fields)) :
+        instruction += fields[i] + ", "
+    
+    instruction = instruction[:-2] + ") VALUES\n"
     
     if (header) :
         start = 1
