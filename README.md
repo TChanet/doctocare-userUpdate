@@ -20,7 +20,7 @@ For more informations, please visit :
 First, clone this repository to a local directory of your choice.
 * In order to do that, open a terminal, then move to the directory of your choice using the 'cd' command :
 ```sh
-cd/[PATH-TO-THE-REPOSITORY]
+cd [PATH-TO-THE-REPOSITORY]
 ```
 * Then run :
 ```sh
@@ -30,7 +30,7 @@ git clone https://github.com/TChanet/doctocare-userUpdate.git
 ## Run the program
 To run the program, open a terminal and move to the repository using the 'cd' command.
 ```sh
-cd/[PATH-TO-THE-REPOSITORY]/doctocare-userUpdate
+cd [PATH-TO-THE-REPOSITORY]/doctocare-userUpdate
 ```
 Finally, simply run the following command :
 ``` sh
