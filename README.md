@@ -17,15 +17,15 @@ For more informations, please visit :
 [Install pip]:https://pip.pypa.io/en/stable/installing/
 
 ## How to use this program
-* First, clone this folder to a repository of your choice.
-* Then, open a terminal and go to this repository.
+* First, clone this repository to a local directory of your choice.
+* Then, open a terminal and move to this directory using the 'cd' command.
 ```sh
 cd/[PATH-TO-THE-REPOSITORY]/doctocare-userUpdate
 ```
 * Finally, simply run the following command :
-
 ``` sh
 python updateUsers.py
 ```
+* Congratulations, your database is now up-to-date !
 ## Author
 Thierry Chanet (DocteGestio)
