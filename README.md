@@ -16,16 +16,26 @@ For more informations, please visit :
 
 [Install pip]:https://pip.pypa.io/en/stable/installing/
 
-## How to use this program
-* First, clone this repository to a local directory of your choice.
-* Then, open a terminal and move to this directory using the 'cd' command.
+## Clone this repository
+First, clone this repository to a local directory of your choice.
+* In order to do that, open a terminal, then move to the directory of your choice using the 'cd' command :
+```sh
+cd/[PATH-TO-THE-REPOSITORY]
+```
+* Then run :
+```sh
+git clone https://github.com/TChanet/doctocare-userUpdate.git
+```
+
+## Run the program
+To run the program, open a terminal and move to the repository using the 'cd' command.
 ```sh
 cd/[PATH-TO-THE-REPOSITORY]/doctocare-userUpdate
 ```
-* Finally, simply run the following command :
+Finally, simply run the following command :
 ``` sh
 python updateUsers.py
 ```
-* Congratulations, your database is now up-to-date !
+Congratulations, your database is now up-to-date !
 ## Author
 Thierry Chanet (DocteGestio)
