@@ -14,6 +14,11 @@ sudo pip install -U pip
 python -m pip install -U pip
 ```
 
+Install the google API package
+```sh
+pip install --upgrade google-api-python-client
+```
+
 Install the psycopg2 package, to connect and use the database
 ``` sh
 sudo pip install psycopg2
