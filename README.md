@@ -4,9 +4,12 @@ Contains the updateUser application, used to update the DocteGestio database.
 ## Dependencies
 To run this program, you'll need to download and install some python modules.
 To do that, open a console terminal and simply run the following commands :
-
+* Install the psycopg2 package, to connect and use the database
 ``` sh
 sudo pip install psycopg2
+```
+* Install the oauth2client, to use the credentials from the Google Admin API
+```sh
 sudo pip install oauth2client
 ```
 
