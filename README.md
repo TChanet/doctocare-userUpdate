@@ -37,22 +37,20 @@ For more informations, please visit :
 First, clone this repository to a local directory of your choice.
 * In order to do that, open a terminal, then move to the directory of your choice using the 'cd' command :
 ```sh
-cd [PATH-TO-THE-REPOSITORY]
+cd ~/[PATH-TO-THE-REPOSITORY]
 ```
+Where [PATH-TO-THE-REPOSITORY] leads to a directory of your choice, (Ex: Documents/my-folder).
 * Then run :
 ```sh
 git clone https://github.com/TChanet/doctocare-userUpdate.git
 ```
 
 ## Run the program
-To run the program, open a terminal and move to the repository using the 'cd' command.
+To update your database, simply run :
 ```sh
-cd [PATH-TO-THE-REPOSITORY]/doctocare-userUpdate
+python ~/[PATH-TO-THE-REPOSITORY]/doctocare-userUpdate/updateUsers.py
 ```
-Finally, simply run the following command :
-``` sh
-python updateUsers.py
-```
+
 Congratulations, your database is now up-to-date !
 ## Author
 Thierry Chanet (DocteGestio)
