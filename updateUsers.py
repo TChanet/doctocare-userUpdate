@@ -55,13 +55,15 @@ def get_credentials():
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
-    
-    
+
+
 def retreive_users():
     """Retreive users from a spreadsheet
 
     Finds them at the address :
     https://docs.google.com/spreadsheets/d/1Vc5SufRGZVo0OVhrp_hsPt67UfQbdrkH_mRCcWksHs8/edit#gid=0
+    
+    TO BE IMPROVED : the range of the selected data should depend on the number of fields
     """
     print("Retrieving data... ", end="")
     credentials = get_credentials()
@@ -72,7 +74,9 @@ def retreive_users():
                               discoveryServiceUrl=discoveryUrl)
 
     spreadsheetId = '1Vc5SufRGZVo0OVhrp_hsPt67UfQbdrkH_mRCcWksHs8'
-    rangeName = 'A1:H5200'
+    
+    rangeName = 'A1:Q5200' # TO BE IMPROVED
+    
     result = service.spreadsheets().values().get(
         spreadsheetId=spreadsheetId, range=rangeName).execute()
     data = result.get('values', [])
@@ -82,77 +86,80 @@ def retreive_users():
     else:
         print("done.\n")
         return data
-        
-        
-def direct_update (data, table = "collaborateur", fields = ("prenom", "nom", "mail", "mobile", "structure_juridique", "description", "titre", "departement"), header = True) :
+
+
+def direct_update (data, table = "collaborateur", fields = ("prenom", "nom", "mail", "mobile", "structure_juridique", "description", "titre", "departement", "domaine", "est_admin", "mail_responsable", "organisation_path", "metier", "structure_juridique_path", "etablissement_path", "sous_structure"), header = True) :
     '''
         Updates the doctocare-database with new data.
-        
+
         Taking data in the form : [row1 : [attribute1, attribute2, ...], row2 : [attribute1, attribute2, ...]], updates directly the database using the psycopg2 package.
-        
-        TO BE IMPROVED : For now, connection information and the attributes are defined within the function.
+
+        TO BE IMPROVED : For now, the datastructure is pretty rigid. Can be improved by working on a dictinnary-like way to store data.
     '''
-    
+
     # Connect to the database using the psycopg2 package #
     print("Connecting to database... ", end="")
     conn = psycopg2.connect(user='postgres', password='doctocare2049',
                             host='130.211.54.253', port='5432')
-                            
+
     curr = conn.cursor()
     print("done.\n")
-    # Generate the postgreSQL instructions from the data provided # 
+    # Generate the postgreSQL instructions from the data provided #
     print("Generating instruction... ", end="")
     instruction = "INSERT INTO " + table + " ("
     for i in range (len(fields)) :
         instruction += fields[i] + ", "
-    
+
     instruction = instruction[:-2] + ") VALUES\n"
-    
+
     if (header) :
         start = 1
     else :
         start = 0
-    
-    
-    for row in data[start:] : 
+
+
+    for row in data[start:] :
         
+        if len(row) > len(fields) :
+            row = row[:len(fields)] # Erases the unused data. Requests that data is ordered the same way as the fields.
+
         while len(row) < len(fields) :
             row.append("undefined")
-        
+
         instruction += "("
-        
+
         for cell in row :
             cell = cell.replace('"', '')
-            
-            if (cell == "") : 
+
+            if (cell == "") :
                 cell = "undefined"
-                
+
             instruction += '"' + cell + '", '
-            
+
         instruction = instruction[:-2] + "),\n"
         instruction = instruction.replace('undefined', 'null')
-    
+
     instruction = instruction.replace('""', '"null"')
     instruction = instruction.replace("'", "/")
     instruction = instruction.replace('"', "'")
     instruction = instruction[:-2] + "\n"
-    instruction += "ON CONFLICT (mail) DO NOTHING;"
-    
-    
+    instruction += "ON CONFLICT (mail) DO NOTHING;" # Makes sure there won't be trouble, but not efficient. TO BE IMROVED.
+
+
     instruction = instruction.encode("UTF-8")
-    
+
     print("done.\nGenerated instruction : \n" + instruction[:350] + "...")
     showMore = (raw_input("/To show the complete instruction please press s/  ") == 's')
-    
+
     if (showMore) :
         print(instruction)
-    
+
     # Update the data directly in the database #
     try :
         curr.execute(instruction)
     except psycopg2.Error as e :
         print(e.pgerror)
-        
+
     # Confirm the instruction #
     confirm = raw_input("Are you sure you want to commit this instruction ? /y or n/  ")
     if (confirm == "y") :
@@ -160,12 +167,11 @@ def direct_update (data, table = "collaborateur", fields = ("prenom", "nom", "ma
         print("Database updated !")
     else :
         print("Aborted")
-        
+
     # Close connection #
     curr.close()
     conn.close()
-    
+
 if __name__ == '__main__':
     data = retreive_users()
     direct_update(data)
-        
