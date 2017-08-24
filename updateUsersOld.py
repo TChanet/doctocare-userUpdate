@@ -56,12 +56,13 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
+
 def retreive_users():
     """Retreive users from a spreadsheet
 
     Finds them at the address :
     https://docs.google.com/spreadsheets/d/1Vc5SufRGZVo0OVhrp_hsPt67UfQbdrkH_mRCcWksHs8/edit#gid=0
-
+    
     TO BE IMPROVED : the range of the selected data should depend on the number of fields
     """
     print("Retrieving data... ", end="")
@@ -73,9 +74,9 @@ def retreive_users():
                               discoveryServiceUrl=discoveryUrl)
 
     spreadsheetId = '1Vc5SufRGZVo0OVhrp_hsPt67UfQbdrkH_mRCcWksHs8'
-
-    rangeName = 'A1:AB10000' # TO BE IMPROVED
-
+    
+    rangeName = 'A1:U5200' # TO BE IMPROVED
+    
     result = service.spreadsheets().values().get(
         spreadsheetId=spreadsheetId, range=rangeName).execute()
     data = result.get('values', [])
@@ -86,60 +87,25 @@ def retreive_users():
         print("done.\n")
         return data
 
-def generate_update_instruction(data, table, fields, header):
-    if (header) :
-        start = 1
-    else :
-        start = 0
 
-    instruction = ""
+def direct_update (data, table = "collaborateur", fields = ("prenom", "nom", "mail", "mobile", "structure_juridique", "description", "titre", "departement", "domaine", "est_admin", "mail_responsable", "organisation_path", "metier", "structure_juridique_path", "etablissement_path", "sous_structure"), header = True) :
+    '''
+        Updates the doctocare-database with new data.
 
-    for row in data[start:] :
+        Taking data in the form : [row1 : [attribute1, attribute2, ...], row2 : [attribute1, attribute2, ...]], updates directly the database using the psycopg2 package.
 
-        fieldNumber = 0
-        instructionRow = "UPDATE " + table + " SET "
+        TO BE IMPROVED : For now, the datastructure is pretty rigid. Can be improved by working on a dictinnary-like way to store data.
+    '''
 
-        if len(row) > len(fields) :
-            row = row[:len(fields)] # Erases the unused data. Requests that data is ordered the same way as the fields.
+    # Connect to the database using the psycopg2 package #
+    print("Connecting to database... ", end="")
+    conn = psycopg2.connect(user='postgres', password='doctocare2049',
+                            host='130.211.54.253', port='5432')
 
-        while len(row) < len(fields) :
-            row.append("undefined")
-
-        for cell in row :
-            if (fields[fieldNumber] != "mail") :
-                cell = cell.replace('"', '')
-
-                if (cell == "") :
-                    cell = "undefined"
-
-                instructionRow += fields[fieldNumber] + ' = "' + cell + '", '
-
-            else :
-                mail = cell
-
-            fieldNumber += 1
-
-        instructionRow = instructionRow[:-2] + ' WHERE mail = "' + mail + '";\n'
-        instructionRow = instructionRow.replace('undefined', 'null')
-
-        instruction += instructionRow
-
-    instruction = instruction.replace('""', '"null"')
-    instruction = instruction.replace("'", "/")
-    instruction = instruction.replace('"', "'")
-    instruction = instruction + "\n"
-
-    instruction = instruction.encode("UTF-8")
-
-    print("done.\nGenerated Update instruction : \n" + instruction[:350] + "...")
-    showMore = (raw_input("/To show the complete instruction please press s/  ") == 's')
-
-    if (showMore) :
-        print(instruction)
-
-    return instruction
-
-def generate_insert_instruction(data, table, fields, header):
+    curr = conn.cursor()
+    print("done.\n")
+    # Generate the postgreSQL instructions from the data provided #
+    print("Generating instruction... ", end="")
     instruction = "INSERT INTO " + table + " ("
     for i in range (len(fields)) :
         instruction += fields[i] + ", "
@@ -153,7 +119,7 @@ def generate_insert_instruction(data, table, fields, header):
 
 
     for row in data[start:] :
-
+        
         if len(row) > len(fields) :
             row = row[:len(fields)] # Erases the unused data. Requests that data is ordered the same way as the fields.
 
@@ -188,40 +154,6 @@ def generate_insert_instruction(data, table, fields, header):
     if (showMore) :
         print(instruction)
 
-    return instruction
-
-def direct_update (data,
-                   table = "collaborateur",
-                   fields = ("prenom", "nom", "mail", "password", "mail_secondaire",
-                   "tel_accueil", "tel_fixe", "tel_mobile", "adresse_accueil", "adresse_professionelle",
-                   "identifiant_employe", "type_employe", "titre", "mail_responsable", "service",
-                   "centre_de_couts", "activites", "fonctions_digitales", "structure_juridique_digitale",
-                   "etablissement_digital", "organisation_unit", "structure_juridique", "domaine", "est_admin",
-                   "organisation_path", "metier", "structure_juridique_path", "etablissement_path", "sous_structure"),
-                   header = True) :
-    '''
-        Updates the doctocare-database with new data.
-
-        Taking data in the form : [row1 : [attribute1, attribute2, ...], row2 : [attribute1, attribute2, ...]], updates directly the database using the psycopg2 package.
-
-        TO BE IMPROVED : For now, the datastructure is pretty rigid. Can be improved by working on a dictinnary-like way to store data.
-    '''
-
-    # Connect to the database using the psycopg2 package #
-    print("Connecting to database... ", end="")
-    conn = psycopg2.connect(user='postgres', password='doctocare2049',
-                            host='130.211.54.253', port='5432')
-
-    curr = conn.cursor()
-    print("done.\n")
-    # Generate the postgreSQL instructions from the data provided #
-    print("Generating Update instruction... ", end="")
-    update_instruction = generate_update_instruction(data, table, fields, header)
-
-    print("Generating instruction... ", end="")
-    insert_instruction = generate_insert_instruction(data, table, fields, header)
-
-    instruction = update_instruction + insert_instruction
     # Update the data directly in the database #
     try :
         curr.execute(instruction)
